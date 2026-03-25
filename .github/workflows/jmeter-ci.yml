@@ -1,0 +1,97 @@
+# Pipeline CI: valida o plano JMeter (smoke) e publica artefatos (JTL + relatório HTML).
+# O teste completo de 250 RPS deve rodar em ambiente autorizado (local ou runner dedicado).
+
+name: JMeter — CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  JMETER_VERSION: "5.6.3"
+
+jobs:
+  jmeter-smoke:
+    name: Smoke (load test — parâmetros reduzidos)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Instalar Apache JMeter
+        env:
+          JMETER_HOME: ${{ github.workspace }}/apache-jmeter-${{ env.JMETER_VERSION }}
+        run: |
+          set -euo pipefail
+          wget -q "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz"
+          tar -xzf "apache-jmeter-${JMETER_VERSION}.tgz"
+          echo "${JMETER_HOME}/bin" >> "$GITHUB_PATH"
+          jmeter --version
+
+      - name: Instalar plugin Throughput Shaping Timer (jpgc-tst)
+        env:
+          JMETER_HOME: ${{ github.workspace }}/apache-jmeter-${{ env.JMETER_VERSION }}
+        run: |
+          set -euo pipefail
+          wget -q -O jmeter-plugins-manager.jar \
+            "https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.10/jmeter-plugins-manager-1.10.jar"
+          cp jmeter-plugins-manager.jar "${JMETER_HOME}/lib/ext/"
+          java -jar "${JMETER_HOME}/lib/ext/jmeter-plugins-manager.jar" install jpgc-tst
+
+      - name: Executar smoke — load test
+        run: |
+          set -euo pipefail
+          mkdir -p jmeter/results
+          # Parâmetros -J sobrescrevem os defaults do plano (ver User Defined Variables com __P).
+          jmeter -n \
+            -t jmeter/test-plans/blazedemo_load_250rps.jmx \
+            -l jmeter/results/ci_load.jtl \
+            -e -o jmeter/results/ci_load_report \
+            -JTARGET_RPS=5 \
+            -JRAMP_UP_SECONDS=10 \
+            -JHOLD_SECONDS=120 \
+            -JTHREADS_MAX=40
+
+      - name: Verificar taxa de erro no relatório
+        run: |
+          set -euo pipefail
+          python3 << 'PY'
+          import json
+          import sys
+          from pathlib import Path
+
+          p = Path("jmeter/results/ci_load_report/statistics.json")
+          if not p.exists():
+              print("ERRO: statistics.json não encontrado.")
+              sys.exit(1)
+          data = json.loads(p.read_text(encoding="utf-8"))
+          total = data.get("Total") or {}
+          raw = total.get("errorPct", "0")
+          if isinstance(raw, (int, float)):
+              err = float(raw)
+          else:
+              err = float(str(raw).replace("%", "").strip())
+          print(f"errorPct = {err}")
+          if err > 0:
+              print("Falha: existem erros nos samples.")
+              sys.exit(1)
+          print("OK: nenhum erro reportado em statistics.json (Total).")
+          PY
+
+      - name: Upload artefatos (JTL + relatório HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-smoke-${{ github.run_number }}
+          path: |
+            jmeter/results/ci_load.jtl
+            jmeter/results/ci_load_report/

@@ -1,0 +1,4 @@
+firstName,lastName,address,city,state,zipCode,cardType,creditCardNumber,creditCardMonth,creditCardYear,nameOnCard
+Resource,Frodrigues,Rua A 123,Sao Paulo,SP,01000-000,visa,4111111111111111,11,2030,Resource Frodrigues
+Maria,Silva,Av Central 456,Rio de Janeiro,RJ,20000-000,mastercard,5555555555554444,12,2031,Maria Silva
+Joao,Souza,Rua B 789,Belo Horizonte,MG,30000-000,amex,378282246310005,10,2032,Joao Souza

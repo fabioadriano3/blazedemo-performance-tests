@@ -1,0 +1,3 @@
+# Saídas locais / CI (não versionar relatórios grandes)
+jmeter/results/**
+!jmeter/results/.keep
