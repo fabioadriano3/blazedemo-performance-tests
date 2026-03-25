@@ -192,7 +192,7 @@
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
-            <stringProp name="HTTPSampler.path">/reserve</stringProp>
+            <stringProp name="HTTPSampler.path">/reserve.php</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -201,7 +201,7 @@
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract - flight (1o resultado)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">flight</stringProp>
-              <stringProp name="RegexExtractor.regex">name=&quot;flight&quot; value=&quot;([^&quot;]+)&quot;</stringProp>
+              <stringProp name="RegexExtractor.regex">value=&quot;([^&quot;]+)&quot;[^&gt;]*name=&quot;flight&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default"></stringProp>
               <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -211,7 +211,7 @@
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract - price (1o resultado)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">price</stringProp>
-              <stringProp name="RegexExtractor.regex">name=&quot;price&quot; value=&quot;([^&quot;]+)&quot;</stringProp>
+              <stringProp name="RegexExtractor.regex">value=&quot;([^&quot;]+)&quot;[^&gt;]*name=&quot;price&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default"></stringProp>
               <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -221,7 +221,7 @@
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract - airline (1o resultado)" enabled="true">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">airline</stringProp>
-              <stringProp name="RegexExtractor.regex">name=&quot;airline&quot; value=&quot;([^&quot;]+)&quot;</stringProp>
+              <stringProp name="RegexExtractor.regex">value=&quot;([^&quot;]+)&quot;[^&gt;]*name=&quot;airline&quot;</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default"></stringProp>
               <stringProp name="RegexExtractor.match_number">1</stringProp>
@@ -229,7 +229,7 @@
             </RegexExtractor>
             <hashTree/>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Lista de voos carregou" enabled="true">
-              <collectionProp name="Asserion.test_strings">
+              <collectionProp name="Assertion.test_strings">
                 <stringProp name="1">Choose This Flight</stringProp>
               </collectionProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -279,14 +279,14 @@
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
-            <stringProp name="HTTPSampler.path">/purchase</stringProp>
+            <stringProp name="HTTPSampler.path">/purchase.php</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Página de compra carregou" enabled="true">
-              <collectionProp name="Asserion.test_strings">
+              <collectionProp name="Assertion.test_strings">
                 <stringProp name="1">Purchase</stringProp>
               </collectionProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
@@ -371,14 +371,14 @@
               </collectionProp>
             </elementProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
-            <stringProp name="HTTPSampler.path">/confirmation</stringProp>
+            <stringProp name="HTTPSampler.path">/confirmation.php</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
           </HTTPSamplerProxy>
           <hashTree>
             <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Assert - Compra realizada com sucesso" enabled="true">
-              <collectionProp name="Asserion.test_strings">
+              <collectionProp name="Assertion.test_strings">
                 <stringProp name="1">Thank you for your purchase today!</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message">Mensagem de sucesso não encontrada.</stringProp>
