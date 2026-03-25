@@ -11,6 +11,8 @@ on:
 
 env:
   JMETER_VERSION: "5.6.3"
+  # Não use ${{ env.* }} no env do job (schema não permite). Manter sufixo alinhado a JMETER_VERSION.
+  JMETER_HOME: ${{ github.workspace }}/apache-jmeter-5.6.3
 
 jobs:
   jmeter-smoke:
@@ -28,18 +30,16 @@ jobs:
           java-version: "17"
 
       - name: Instalar Apache JMeter
-        env:
-          JMETER_HOME: ${{ github.workspace }}/apache-jmeter-${{ env.JMETER_VERSION }}
         run: |
           set -euo pipefail
           wget -q "https://dlcdn.apache.org/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz"
           tar -xzf "apache-jmeter-${JMETER_VERSION}.tgz"
-          echo "${JMETER_HOME}/bin" >> "$GITHUB_PATH"
-          jmeter --version
+          # GITHUB_PATH só vale a partir do *próximo* step; export garante este step e os seguintes.
+          export PATH="${JMETER_HOME}/bin:${PATH}"
+          echo "${JMETER_HOME}/bin" >> "${GITHUB_PATH}"
+          "${JMETER_HOME}/bin/jmeter" --version
 
       - name: Instalar plugin Throughput Shaping Timer (jpgc-tst)
-        env:
-          JMETER_HOME: ${{ github.workspace }}/apache-jmeter-${{ env.JMETER_VERSION }}
         run: |
           set -euo pipefail
           wget -q -O jmeter-plugins-manager.jar \
@@ -50,9 +50,10 @@ jobs:
       - name: Executar smoke — load test
         run: |
           set -euo pipefail
+          export PATH="${JMETER_HOME}/bin:${PATH}"
           mkdir -p jmeter/results
           # Parâmetros -J sobrescrevem os defaults do plano (ver User Defined Variables com __P).
-          jmeter -n \
+          "${JMETER_HOME}/bin/jmeter" -n \
             -t jmeter/test-plans/blazedemo_load_250rps.jmx \
             -l jmeter/results/ci_load.jtl \
             -e -o jmeter/results/ci_load_report \
