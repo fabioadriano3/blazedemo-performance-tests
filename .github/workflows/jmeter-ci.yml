@@ -39,13 +39,15 @@ jobs:
           echo "${JMETER_HOME}/bin" >> "${GITHUB_PATH}"
           "${JMETER_HOME}/bin/jmeter" --version
 
+      # Opção A (CI): baixar os JARs do Maven — não use java -jar no jmeter-plugins-manager.jar
+      # (ele não é um “fat JAR” com Main-Class para execução direta).
       - name: Instalar plugin Throughput Shaping Timer (jpgc-tst)
         run: |
           set -euo pipefail
-          wget -q -O jmeter-plugins-manager.jar \
-            "https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-manager/1.10/jmeter-plugins-manager-1.10.jar"
-          cp jmeter-plugins-manager.jar "${JMETER_HOME}/lib/ext/"
-          java -jar "${JMETER_HOME}/lib/ext/jmeter-plugins-manager.jar" install jpgc-tst
+          wget -q -O "${JMETER_HOME}/lib/ext/jmeter-plugins-cmn-jmeter-0.7.jar" \
+            "https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-cmn-jmeter/0.7/jmeter-plugins-cmn-jmeter-0.7.jar"
+          wget -q -O "${JMETER_HOME}/lib/ext/jmeter-plugins-tst-2.6.jar" \
+            "https://repo1.maven.org/maven2/kg/apc/jmeter-plugins-tst/2.6/jmeter-plugins-tst-2.6.jar"
 
       - name: Executar smoke — load test
         run: |
